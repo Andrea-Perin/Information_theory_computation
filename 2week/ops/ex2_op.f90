@@ -31,17 +31,17 @@ MODULE MATOP
 CONTAINS
 
   
-  FUNCTION NULL_INIT(mat_size)
+  FUNCTION NULL_INIT(mat_size1, mat_size2)
     ! given the size, this initialization creates a null RICHMAT. If either
     ! one of the dimensions is null or negative, the matrix is left undefined,
     ! having both dimensions set to 0. An error message is also displayed.
     ! - mat_size : a 2-elements array containing the number of rows and
     !   cols of the matrix
-    INTEGER*4, DIMENSION(2), INTENT(IN) :: mat_size
+    INTEGER*4, INTENT(IN) :: mat_size1, mat_size2
     TYPE(RICHMAT) :: NULL_INIT
-    if ((mat_size(1) .ge. 1) .and. (mat_size(2) .ge. 1)) then
-       ALLOCATE(NULL_INIT%elems(mat_size(1),mat_size(2)))
-       NULL_INIT%dims = mat_size
+    if ((mat_size1 .ge. 1) .and. (mat_size2 .ge. 1)) then
+       ALLOCATE(NULL_INIT%elems(mat_size1,mat_size2))
+       NULL_INIT%dims = (/ mat_size1, mat_size2 /)
        NULL_INIT%elems = 0.d0
        NULL_INIT%trace = 0.d0
        NULL_INIT%det = 0.d0
@@ -146,7 +146,7 @@ CONTAINS
     ! of the OPEN function (?) is employed.
     ! - fname : the name of the file on which to save the info
     ! - rich_mat : the RICHMAT to write on file
-    CHARACTER*16 :: fname
+    CHARACTER*9 :: fname
     TYPE(RICHMAT) :: rich_mat
     INTEGER*4 :: ii
     open(12, file=fname, status="REPLACE", action="WRITE")
@@ -172,35 +172,56 @@ PROGRAM EX2_WEEK2
   USE MATOP
   IMPLICIT NONE
 
-  TYPE(RICHMAT) :: A, B
-  INTEGER*4, DIMENSION(2) :: msize
-  INTEGER*4 :: ii
+  TYPE(RICHMAT) :: richA, richB
+  INTEGER*4 :: ii, nrows, ncols
   REAL*8, DIMENSION(:,:), ALLOCATABLE :: re,im
-  COMPLEX*16, DIMENSION(:,:), ALLOCATABLE :: C,D
-  
-  msize(1)=3
-  msize(2)=3
+  COMPLEX*16, DIMENSION(:,:), ALLOCATABLE :: matC,matD
 
-  ! USING PLAIN MATRICES
-  ALLOCATE(re(msize(1),msize(2)),im(msize(1),msize(2)))
-  ALLOCATE(C(msize(1),msize(2)))
-  ALLOCATE(D(msize(1),msize(2)))
-  D=0.d0
+  ! setting the sizes of the matrices, both rich and plain
+  nrows=0
+  ncols=0
+  do while (nrows .le. 0)
+     print*, "Insert the number of rows: "
+     read*, nrows
+     if (nrows .le. 0) print*, "Invalid number of rows."
+  enddo
+  do while (ncols .le. 0)
+     print*, "Insert the number of columns: "
+     read*, ncols
+     if (ncols .le. 0) print*, "Invalid number of columns."
+  enddo
+  
+  ALLOCATE(re(nrows,ncols),im(nrows,ncols))
   call RANDOM_NUMBER(re)
   call RANDOM_NUMBER(im)
-  C = cmplx(re,im)
-  D = .adj.C
-  print*, .trace.D
-  print*, .trace.C
 
+  
+  !-----------------------
+  ! USING PLAIN MATRICES
+  !-----------------------
+  ALLOCATE(matC(nrows,ncols))
+  ALLOCATE(matD(ncols,nrows))
+  matD=0.d0
+  ! setting a random matrix C 
+  matC = cmplx(re,im)
+  ! setting D as the adjoint of C
+  matD = .adj.(matC)
+  ! checking if the traces correspond
+  print*, "The trace of matrix D is: ",.trace.matD
+  print*, "The trace of matrix C is: ",.trace.matC
+
+  
+  !-----------------
   ! USING RICHMATS
-  !A=NULL_INIT(msize)
-  !A%elems=cmplx(re,im)
-  !A%trace= .TRACE.(A)
-  !B=.ADJ.(A)
-  !call WRITE_RICH("test12345678.txt", A)
-  !call WRITE_RICH("12345678test.txt", B)
-  A=NULL_INIT((/ 4, 4 /))
-  print*, .trace.(A)
+  !-----------------
+  ! initializing A, then setting its elements
+  richA=NULL_INIT(ncols,nrows)
+  richA%elems=cmplx(re,im)
+  richA%trace= .TRACE.(richA)
+  ! setting B as the adjoint of A
+  richB=.ADJ.(richA)
+  ! writing both to an external file
+  call WRITE_RICH("richA.txt", richA)
+  call WRITE_RICH("richB.txt", richB)
   STOP
 END PROGRAM EX2_WEEK2
