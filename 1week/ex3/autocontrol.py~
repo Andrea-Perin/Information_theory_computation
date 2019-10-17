@@ -1,0 +1,25 @@
+import numpy as np
+import os
+import subprocess as sub
+
+sizes='matinfo.txt'
+results='results.txt'
+
+#removing the previous results if they are still there
+if os.path.exists(sizes):
+    os.remove(sizes)
+if os.path.exists(results):
+    os.remove(results)
+
+dims = [2,10,100,200]#,500,1000,2000]
+
+for i in dims:
+    with open(sizes,"w+") as file:
+        file.write(str(i)+'\n'+str(i)+'\n'+str(i)+'\n'+str(i))
+    if os.path.exists('ex3.x'):
+        sub.run(['./ex3.x'])
+    if os.path.exists('ex3_opt.x'):
+        sub.run(['./ex3_opt.x'])
+    os.remove(sizes)
+
+sub.run(['gnuplot', 'performance.gnuplot'])
