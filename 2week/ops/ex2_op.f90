@@ -35,8 +35,8 @@ CONTAINS
     ! given the size, this initialization creates a null RICHMAT. If either
     ! one of the dimensions is null or negative, the matrix is left undefined,
     ! having both dimensions set to 0. An error message is also displayed.
-    ! - mat_size : a 2-elements array containing the number of rows and
-    !   cols of the matrix
+    ! - mat_size1, mat_size2 : integers containing the number of rows and
+    !   cols of the matrix, respectively
     INTEGER*4, INTENT(IN) :: mat_size1, mat_size2
     TYPE(RICHMAT) :: NULL_INIT
     if ((mat_size1 .ge. 1) .and. (mat_size2 .ge. 1)) then
@@ -46,7 +46,8 @@ CONTAINS
        NULL_INIT%trace = 0.d0
        NULL_INIT%det = 0.d0
     else
-       print*, "Error: the structure could not be properly created: negative dimension."
+       print*, "Error: the structure could not be properly created: &
+&negative dimension."
        ALLOCATE(NULL_INIT%elems(0,0))
        NULL_INIT%dims = (/ 0, 0 /)
        NULL_INIT%elems = 0.d0
@@ -115,7 +116,7 @@ CONTAINS
     TYPE(RICHMAT), INTENT(IN) :: rich_mat
     TYPE(RICHMAT) :: rich_adjoint
     if (rich_mat%dims(1) .ne. rich_mat%dims(1)) print*, "WARNING: non-square matrix."
-    rich_adjoint%trace = rich_mat%trace
+    rich_adjoint%trace = conjg(rich_mat%trace)
     rich_adjoint%det = conjg(rich_mat%det)
     rich_adjoint%dims = rich_mat%dims(2:1:-1)
     rich_adjoint%elems = transpose(conjg(rich_mat%elems))
@@ -210,7 +211,7 @@ PROGRAM EX2_WEEK2
   print*, "The trace of matrix D is: ",.trace.matD
   print*, "The trace of matrix C is: ",.trace.matC
 
-  
+	
   !-----------------
   ! USING RICHMATS
   !-----------------
