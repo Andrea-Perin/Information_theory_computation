@@ -1,0 +1,4 @@
+- ex1-AndreaPerin-FortranCode.f90 : the Fortran file with the source code
+- ex1-AndreaPerin-test.x : the executable file
+- richA.txt/richB.txt : the output files produced by the test program
+- matop.mod : the module which is used by the fortran source code

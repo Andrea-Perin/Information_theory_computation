@@ -3,7 +3,7 @@ MODULE MATOP
 
   TYPE RICHMAT
      ! This dtype is an "enriched matrix":
-     ! - dims: an integer vector of integers of size 2
+     ! - dims: a vector of integers of size 2
      ! - elems: a double precision complex matrix; its dimensions should
      !   be those stored in dims
      ! - trace: a double precision complex number, representing the
@@ -27,21 +27,24 @@ MODULE MATOP
      MODULE PROCEDURE TRACE_MAT, TRACE_RICH
   END INTERFACE OPERATOR (.TRACE.)
 
+  INTERFACE OPERATOR (.INIT.)
+     MODULE PROCEDURE NULL_INIT
+  END INTERFACE OPERATOR (.INIT.)
   
 CONTAINS
 
   
-  FUNCTION NULL_INIT(mat_size1, mat_size2)
+  FUNCTION NULL_INIT(mat_size)
     ! given the size, this initialization creates a null RICHMAT. If either
     ! one of the dimensions is null or negative, the matrix is left undefined,
     ! having both dimensions set to 0. An error message is also displayed.
     ! - mat_size1, mat_size2 : integers containing the number of rows and
     !   cols of the matrix, respectively
-    INTEGER*4, INTENT(IN) :: mat_size1, mat_size2
+    INTEGER*4, DIMENSION(2), INTENT(IN) :: mat_size
     TYPE(RICHMAT) :: NULL_INIT
-    if ((mat_size1 .ge. 1) .and. (mat_size2 .ge. 1)) then
-       ALLOCATE(NULL_INIT%elems(mat_size1,mat_size2))
-       NULL_INIT%dims = (/ mat_size1, mat_size2 /)
+    if ((mat_size(1) .ge. 1) .and. (mat_size(2) .ge. 1)) then
+       ALLOCATE(NULL_INIT%elems(mat_size(1),mat_size(2)))
+       NULL_INIT%dims = mat_size
        NULL_INIT%elems = 0.d0
        NULL_INIT%trace = 0.d0
        NULL_INIT%det = 0.d0
@@ -175,6 +178,7 @@ PROGRAM EX2_WEEK2
 
   TYPE(RICHMAT) :: richA, richB
   INTEGER*4 :: ii, nrows, ncols
+  INTEGER*4, DIMENSION(2) :: dimens
   REAL*8, DIMENSION(:,:), ALLOCATABLE :: re,im
   COMPLEX*16, DIMENSION(:,:), ALLOCATABLE :: matC,matD
 
@@ -191,7 +195,7 @@ PROGRAM EX2_WEEK2
      read*, ncols
      if (ncols .le. 0) print*, "Invalid number of columns."
   enddo
-  
+  dimens = (/ nrows, ncols /)
   ALLOCATE(re(nrows,ncols),im(nrows,ncols))
   call RANDOM_NUMBER(re)
   call RANDOM_NUMBER(im)
@@ -210,13 +214,14 @@ PROGRAM EX2_WEEK2
   ! checking if the traces correspond
   print*, "The trace of matrix D is: ",.trace.matD
   print*, "The trace of matrix C is: ",.trace.matC
-
+  DEALLOCATE(matC,matD)
 	
   !-----------------
   ! USING RICHMATS
   !-----------------
   ! initializing A, then setting its elements
-  richA=NULL_INIT(ncols,nrows)
+  
+  richA=.INIT.(dimens)
   richA%elems=cmplx(re,im)
   richA%trace= .TRACE.(richA)
   ! setting B as the adjoint of A
@@ -224,5 +229,6 @@ PROGRAM EX2_WEEK2
   ! writing both to an external file
   call WRITE_RICH("richA.txt", richA)
   call WRITE_RICH("richB.txt", richB)
+  DEALLOCATE(richA%elems, richB%elems)
   STOP
 END PROGRAM EX2_WEEK2
