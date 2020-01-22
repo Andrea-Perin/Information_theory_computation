@@ -1,0 +1,286 @@
+MODULE PROB_DIST
+!!$  This module contains some utilities for the creation of histograms,
+!!$  normalized histograms, distributions and KDEs.
+
+  REAL*4, PARAMETER :: pi=ACOS(-1.)
+  
+CONTAINS
+
+  SUBROUTINE HISTOGRAM(input_data,histo,bin_edges,num_bins_opt,man_rng)
+!!$    A simple histogram. Given an input array, the number of bins
+!!$    and the range over which to consider the data, it returns two
+!!$    arrays, one with the counts and one with the bin edges.
+!!$    All bins are of type [low,up) except the last, [low,up].
+!!$    ARGUMENTS:
+!!$    I: input_data   : a REAL*4 array containing the data to histogram.
+!!$    O: histo        : an INTEGER*4 array, containing the counts per bin.
+!!$    O: bin_edges    : a REAL*4 array, containing the edges of the bins. It
+!!$    has one element more than histo.
+!!$    I: num_bins_opt : (OPT) an INTEGER*4 containing the number of bins
+!!$    I: man_rng      : (OPT) a REAL*4 array, containing the lower and
+!!$    upper extremes of the histograms. Data outside this range is not
+!!$    considered.
+    
+    REAL*4, DIMENSION(:) :: input_data
+    REAL*4, DIMENSION(:), ALLOCATABLE :: bin_edges
+    INTEGER*4, DIMENSION(:), ALLOCATABLE :: histo
+    REAL*4 :: binwidth, min_val, max_val
+    INTEGER*4, OPTIONAL :: num_bins_opt
+    INTEGER*4 :: num_bins,ii,jj
+    REAL*4, DIMENSION(2), OPTIONAL :: man_rng
+    
+    ! num_bins is set to 60 by default
+    IF(PRESENT(num_bins_opt).AND.(num_bins_opt.NE.0)) THEN
+       num_bins=num_bins_opt
+    ELSE
+       num_bins=60
+    END IF
+    
+    ! setting the binwidth
+    IF (PRESENT(man_rng).AND.(man_rng(1).LT.man_rng(2))) THEN
+       min_val=man_rng(1)
+       max_val=man_rng(2)
+    ELSE
+       min_val = MINVAL(input_data)
+       max_val = MAXVAL(input_data)
+    END IF
+    binwidth=(max_val-min_val)/num_bins
+
+    ! allocating the results
+    ALLOCATE(histo(num_bins))
+    ALLOCATE(bin_edges(num_bins+1))
+
+    ! filling the histogram
+    histo = 0
+    DO ii=1,SIZE(input_data)
+       DO jj=1,num_bins-1
+          IF ((input_data(ii) .ge. min_val+REAL(jj-1)*binwidth) &
+               .AND. (input_data(ii) .lt. min_val+REAL(jj)*binwidth)) THEN
+             histo(jj)=histo(jj)+1
+          END IF
+       END DO
+       IF ((input_data(ii) .ge. min_val+REAL(num_bins-1)*binwidth) &
+            .AND. (input_data(ii) .le. min_val+REAL(num_bins)*binwidth)) THEN
+          histo(num_bins)=histo(num_bins)+1
+       END IF
+    END DO
+    ! filling the edges of the histogram
+    DO ii=1,num_bins+1
+       bin_edges(ii)=min_val+(ii-1)*binwidth
+    END DO
+    RETURN
+  END SUBROUTINE HISTOGRAM
+
+  SUBROUTINE NORM_HISTOGRAM(input_data,histo,bin_edges,num_bins_opt,man_rng)
+!!$    A simple wrapper of the HISTOGRAM subroutine, which takes the
+!!$    integer result of the latter and turns it into a REAL result,
+!!$    by dividing it by the total counts in the histogram.
+!!$    ARGUMENTS:
+!!$    I: input_data    : a REAL*4 array, containing the data to hist.
+!!$    O: histo         : a REAL*4 array, containing the normalized
+!!$    counts per bin.
+!!$    O: bin_edges     : a REAL*4 array, containing the edges of the bins
+!!$    I: num_bins_opt  : (OPT) an INTEGER*4, containing the number
+!!$    of bins tht should be taken
+!!$    I: man_rng       : (OPT) a REAL*4 array, containing the lower and
+!!$    upper exrtemes for the histogram.
+       
+    REAL*4, DIMENSION(:) :: input_data
+    REAL*4, DIMENSION(:), ALLOCATABLE :: bin_edges, histo
+    INTEGER*4, DIMENSION(:), ALLOCATABLE :: histo_tmp 
+    REAL*4 :: binwidth
+    INTEGER*4, OPTIONAL :: num_bins_opt
+    REAL*4, DIMENSION(2), OPTIONAL :: man_rng
+    ! calling the HISTOGRAM SUBROUTINE
+    CALL HISTOGRAM(input_data,histo_tmp,bin_edges,num_bins_opt,man_rng)
+    ! normalizing the produced histogram
+    histo=REAL(histo_tmp)/SUM(histo_tmp)
+    DEALLOCATE(histo_tmp)
+    RETURN
+  END SUBROUTINE NORM_HISTOGRAM
+
+  SUBROUTINE PROB_DISTRIBUTION(input_data,dist,x_points,num_bins_opt,man_rng)
+!!$    A simple probability distribution estimator which is based on
+!!$    the NORM_HISTOGRAM subroutine. Simply normalizes each bin by its
+!!$    width.
+!!$    ARGUMENTS:
+!!$    I: input_data    : a REAL*4 array, containing the data to distribute
+!!$    O: dist          : a REAL*4 array, containing the values of the
+!!$    distribution for each point
+!!$    O: x_points      : a REAL*4 array, containing the points on which
+!!$    the distribution is calculated. These are the middle points of the
+!!$    bins created by the NORM_HISTOGRAM
+!!$    I: num_bins_opt  : (OPT) an INTEGER*4, containing the number
+!!$    of bins that should be taken
+!!$    I: man_rng       : (OPT) a REAL*4 array, containing the lower and
+!!$    upper extremes for the distribution.
+           
+    REAL*4, DIMENSION(:) :: input_data
+    REAL*4, DIMENSION(:), ALLOCATABLE :: bin_edges, x_points, dist, histo
+    INTEGER*4 :: num_bins,ii
+    REAL*4 :: binwidth
+    INTEGER*4, OPTIONAL :: num_bins_opt
+    REAL*4, DIMENSION(2), OPTIONAL :: man_rng
+    
+    CALL NORM_HISTOGRAM(input_data,histo,bin_edges,num_bins_opt,man_rng)
+    num_bins=SIZE(histo)
+    binwidth=bin_edges(2)-bin_edges(1)
+    ALLOCATE(x_points(num_bins))
+    ALLOCATE(dist(num_bins))
+    
+    DO ii=1, num_bins
+       x_points(ii)=(bin_edges(ii+1)+bin_edges(ii))/2
+       dist(ii)=REAL(histo(ii))/(binwidth)
+    END DO
+    DEALLOCATE(bin_edges,histo)
+    RETURN
+  END SUBROUTINE PROB_DISTRIBUTION
+  
+
+  FUNCTION GAUSS(x_in,grid,sigma) RESULT(y_out)
+!!$    Utility function that, given a set of points in a grid and a
+!!$      real value, computes a gauss distribution on those points
+!!$      with x_in as mean and a given std (set to 0.005 by default).
+!!$      Used for the 'KDE' computation.
+!!$      ARGUMENTS:
+!!$      - x_in     : a REAL*4 value, around which a gaussian is built
+!!$      - grid     : a REAL*4 array, containing the points on which
+!!$      the distribution is calculated
+!!$      -sigma     : (OPT) a REAL*4 value, the sigma of the gaussian
+!!$      RETURNS:
+!!$      -y_out     : a REAL*4 array, containing the values of the
+!!$      gaussian in the points of the passed grid.
+
+    REAL*4, DIMENSION(:) :: grid
+    REAL*4, DIMENSION(SIZE(grid)) :: y_out
+    REAL*4 :: x_in, s
+    REAL*4, OPTIONAL :: sigma
+    s=0.005
+    IF(PRESENT(sigma).AND.(sigma.GE.0.)) s=sigma 
+    y_out=0.d0
+    y_out=EXP(-(grid-x_in)**2/(2*s))/(SQRT(2*pi*s))
+    RETURN
+  END FUNCTION GAUSS
+      
+
+  SUBROUTINE KDE(input_data,x_pts,dist,num_pts_opt,man_range_opt)
+!!$    A kind of Kernel density estimator, which uses gaussian kernels
+!!$    to create an estimate of a PDF from some data. Creates a grid of
+!!$    points on which to compute the distribution, and for each input
+!!$    point computes the value that the gaussian takes on every point
+!!$    in the grid. All values are then added and normalizedd by the
+!!$    number of gaussians. The most important parameter is sigma; it
+!!$    should be sufficiently small, as to 'center' the produced
+!!$    gaussian on the datapoint.
+!!$    ARGUMENTS:
+!!$    I: input_data    : a REAL*4 array, containing the data to distribute
+!!$    O: dist          : a REAL*4 array, containing the values of the
+!!$    distribution for each point
+!!$    O: x_pts         : a REAL*4 array, containing the points on which
+!!$    the distribution is calculated. 
+!!$    I: num_pts_opt   : (OPT) an INTEGER*4, containing the number
+!!$    of points that should be evaluated
+!!$    I: man_rng       : (OPT) a REAL*4 array, containing the lower and
+!!$    upper extremes for the distribution.
+    
+    REAL*4, DIMENSION(:) :: input_data
+    REAL*4, DIMENSION(:), ALLOCATABLE :: x_pts, dist
+    INTEGER*4, OPTIONAL :: num_pts_opt
+    REAL*4, DIMENSION(2), OPTIONAL :: man_range_opt
+
+    REAL*4 :: min_rng,max_rng
+    INTEGER*4 :: n_input,num_pts,ii,in_range
+
+    ! setting number of points in grid
+    IF(PRESENT(num_pts_opt).AND.(num_pts_opt.GE.0))THEN
+       num_pts=num_pts_opt
+    ELSE
+       num_pts=1000
+    END IF
+    ! setting range
+    IF(PRESENT(man_range_opt).AND.(man_range_opt(1).LE.man_range_opt(2)))THEN
+       min_rng=man_range_opt(1)
+       max_rng=man_range_opt(2)
+    ELSE
+       min_rng=MINVAL(input_data)
+       max_rng=MAXVAL(input_data)
+    END IF
+    ALLOCATE(x_pts(num_pts))
+    ALLOCATE(dist(num_pts))
+    ! creating a grid of points
+    DO ii=1,num_pts
+       x_pts(ii)=min_rng+(ii-1)*(max_rng-min_rng)/num_pts
+    END DO
+    ! counting the points inside the given range
+    n_input=SIZE(input_data)
+    in_range=0
+    dist=0.d0
+    DO ii=1,n_input
+       IF ((input_data(ii).GE.min_rng).AND.(input_data(ii).LE.max_rng)) THEN
+          dist=dist+gauss(input_data(ii),x_pts)
+          in_range=in_range+1
+       END IF
+    END DO
+    dist=dist/in_range
+    RETURN
+  END SUBROUTINE KDE
+
+END MODULE PROB_DIST
+
+
+PROGRAM KDE_TRIAL
+  USE PROB_DIST
+  IMPLICIT NONE
+
+  REAL*4, DIMENSION(:), ALLOCATABLE :: spacings
+  REAL*4, DIMENSION(:), ALLOCATABLE :: x_pts, dist
+  INTEGER*4, DIMENSION(:), ALLOCATABLE :: hist
+  INTEGER*4 :: ii,count_lines,io,count_args,pts
+  REAL*4 :: minr,maxr
+  CHARACTER(LEN=100) :: filename
+  CHARACTER*4 :: arg_tmp
+
+  count_args=COMMAND_ARGUMENT_COUNT()
+  IF (count_args.EQ.0)THEN
+     WRITE(*,*) "#NO FILENAME PROVIDED"
+  ELSE
+     ! getting the filename
+     CALL GET_COMMAND_ARGUMENT(1, filename)
+     ! getting the size of the file, to then allocate the array
+     count_lines = 0 
+     OPEN(15,FILE=TRIM(filename))
+     DO
+        READ(15,*,iostat=io)
+        IF (io.NE.0) EXIT
+        count_lines = count_lines + 1
+     END DO
+     REWIND(15)
+     ! allocating the array
+     ALLOCATE(spacings(count_lines))
+     ! filling the array
+     READ(15,*) spacings
+     CLOSE(15)
+     ! getting info on the distribution: num_bins and range
+     IF (count_args.GT.1) THEN
+        CALL GET_COMMAND_ARGUMENT(2,arg_tmp)
+        READ(arg_tmp,*) pts
+        IF (count_args.GE.4) THEN
+           CALL GET_COMMAND_ARGUMENT(3,arg_tmp)
+           READ(arg_tmp,*) minr
+           CALL GET_COMMAND_ARGUMENT(4,arg_tmp)
+           READ(arg_tmp,*) maxr
+           CALL KDE(spacings,dist,x_pts,num_pts_opt=pts,&
+                man_rng=(/minr,maxr/))
+        ELSE
+           CALL KDE(spacings,dist,x_pts,num_pts_opt=pts)
+        END IF
+     ELSE
+        CALL KDE(spacings,dist,x_pts)
+     END IF
+     
+     ! printing to console
+     DO ii=1,SIZE(x_pts)
+        PRINT*, x_pts(ii),dist(ii)
+     END DO
+  END IF
+END PROGRAM KDE_TRIAL

@@ -1,0 +1,36 @@
+GRAPHICAL ANALYSIS
+
+-GOLDEN RULE: plot exactly what you want to show! How can this go wrong? Some examples:
+	- ERRORS: suppose we have some theoretical result f_th and an experimental one, f_exp. One may simply plot both in a plain graph. They may seem to agree just fine; the question, at this point, is "how much?". We need quantitative results; a solution may be to plot the difference (which may be rather close to zero). However, there are still improvements possible: how much do they agree? An interesting quantity may be the relative error, Delta/f; then, it may be lower than 1% for all points. Also, relative or absolute error? It depends on which is the most significant: we should also avoid producing too many graphs (attention threshold!). An improvement in the difference graph is to plot it in logarithmic scale, which may highlight some dependence that was not clear with normal scale. Any such thing should then be investigated to discover any possible dependence.
+	- MONEY vs. TIME: suppose a time series of the money in your bank account. If we had 100k euros, and no decrease was visible with yrange=[0,120k], we may be happy. However, any small variation would not be visible with such a scale! Trends may not be visible at large scale, so we should choose ranges in a proper way. 
+	- MARATHON TIMINGS vs. YEARS: in this case, the order of magnitude is around ~2h. The trend is decreasing; from 1900 to 2019, times have generally decreased. What can we learn from this? We can fit this curve with some polynomial; this may highlight slopes and changes of curvature (for instance, in 1945, times increased as an effect of war on athletes). One may also be inclined to form predictions from the obtained polynomial. Something similar was done some years ago, and it predicted a sub 2h 15 years ago. Of course, this is wrong as future times do not decrease as sharply. Even worse if one were to consider women: there, the slope is even sharper, so such an extrapolation would suggest women greatly outperforming men at one point in the not so distant future. This can be ascribed to the different behavior of fittings when some points are excluded.
+
+
+- GRAPH LIFECYCLE:
+	- SHORT LIVED: ease of use, something efficient to be used frequently. Being nice is not a priority. Not worthy of great time expenditure.
+	- INTERMEDIATE: something that may end up in a Master Thesis. It needs not be perfect (colors of the lines and the points? Easy to print?), but it needs to be easily interpreted. What is it about? Six months from now, it may be needed again; in the same folder we saved the graph in, we may include a settings file, with all relevant parameters.
+	- LONG TERM: they need to be remembered, and as such, they better be nice. Fonts, colors, publication-specific requirements (like no-legends, all info in the caption) and so on. 
+And so, a checklist may be useful:
+	[] Axes labeled;
+	[] Explain ALL lines and datasets;
+	[] Color scales (in the case of contour plots);
+	[] Errorbars (and explain them: how many sigmas, what statistics, and so on);
+	[] Plot ranges;
+	[] Fonts;
+	[] Size of all objects? Things that are clear in fullscreen may become cramped and unintelligible when in the report
+	[] Create PS, PDF, EPS, GIF, ... You never know what may be needed.
+
+- DATA FILES:
+	- We must be able to reproduce or change them
+	- Explanation:  [] sets,
+			[] data format, 
+			[] dependent and indpendent data.
+
+- AN EXAMPLE FROM WWII: statistics of the holes in the aircraft, survival bias. Something wrong in the beginning can lead to something wrong down the line.
+
+
+
+
+
+
+

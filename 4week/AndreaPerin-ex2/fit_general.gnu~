@@ -1,0 +1,5 @@
+load 'settings.txt'
+
+f(x) = function
+
+plot f(x)

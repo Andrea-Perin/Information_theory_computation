@@ -1,0 +1,140 @@
+MODULE SOLVE_SCHR
+  USE HERMITE
+  IMPLICIT NONE
+
+  REAL*8, PARAMETER :: hbar=1!6.62607015D-34
+  REAL*8, PARAMETER :: pi=ACOS(-1.D0)
+
+CONTAINS
+
+  
+  SUBROUTINE LAPLACIAN(N, matr, is_pbc)
+    COMPLEX*16, DIMENSION(:,:), ALLOCATABLE :: matr
+    INTEGER*4 :: N,ii
+    LOGICAL, OPTIONAL :: is_pbc
+    
+    ALLOCATE(matr(N,N))
+
+    matr(1,1)=-2
+    DO ii=2,N
+       matr(ii,ii)=-2
+       matr(ii-1,ii)=1
+       matr(ii,ii-1)=1
+    END DO
+
+    ! setting boundary conditions if necessary
+    
+    IF(PRESENT(is_pbc).AND.(is_pbc))THEN
+       matr(1,N)=1
+       matr(N,1)=1
+    END IF
+    RETURN
+  END SUBROUTINE LAPLACIAN
+
+
+  SUBROUTINE HARM_POTENTIAL(N, matr, omega, x_low, x_high)
+    COMPLEX*16, DIMENSION(:,:), ALLOCATABLE :: matr
+    INTEGER*4 :: N,ii
+    REAL*8 :: omega, x_low, x_high, step
+    
+    step=(x_high-x_low)/N
+    ALLOCATE(matr(N,N))
+    DO ii=1,N
+       matr(ii,ii)=(omega*(x_low+step*(ii-1)))**2
+    END DO
+  END SUBROUTINE HARM_POTENTIAL
+
+
+  SUBROUTINE GET_EGV(matr,egvals,info)
+    COMPLEX*16, DIMENSION(:,:) :: matr
+    REAL*8, DIMENSION(SIZE(matr,1)) :: egvals
+    INTEGER*4 :: info
+    ! utilities for zheev
+    INTEGER*4 :: N,LWORK
+    COMPLEX*16, DIMENSION(:), ALLOCATABLE :: WORK
+    REAL*8, DIMENSION(:), ALLOCATABLE :: RWORK
+    ! preparing for optimization
+    LWORK=-1
+    N=SIZE(matr,1)
+    ALLOCATE(RWORK(3*N-2))
+    ALLOCATE(WORK(1))
+    ! querying optimal workspace
+    CALL ZHEEV('V','U',N,matr,N,egvals,WORK,LWORK,RWORK,info)
+    ! preparing to get the results
+    LWORK=INT(WORK(1))
+    DEALLOCATE(WORK)
+    ALLOCATE(WORK(LWORK))
+    CALL ZHEEV('V','U',N,matr,N,egvals,WORK,LWORK,RWORK,info)
+    ! removing exhausted variables 
+    DEALLOCATE(WORK,RWORK)
+  END SUBROUTINE GET_EGV
+
+
+  SUBROUTINE NORMALIZE_EIGVEC(matr,step)
+    COMPLEX*16, DIMENSION(:,:) :: matr
+    COMPLEX*16 :: norm
+    INTEGER*4 :: ii
+    REAL*8 :: step
+
+    DO ii=1,SIZE(matr,2)
+       norm=SQRT(step*SUM(ABS(matr(:,ii))**2))
+       matr(:,ii)=matr(:,ii)/norm
+    END DO
+    RETURN
+  END SUBROUTINE NORMALIZE_EIGVEC
+
+
+  SUBROUTINE COMPUTE_PROBABILITIES(matr,probs)
+    COMPLEX*16, DIMENSION(:,:) :: matr
+    REAL*8, DIMENSION(SIZE(matr,1),SIZE(matr,2)) :: probs
+    INTEGER*4 :: ii
+
+    DO ii=1,SIZE(matr,2)
+       probs(:,ii)=ABS(matr(:,ii))**2
+    END DO
+    RETURN
+  END SUBROUTINE COMPUTE_PROBABILITIES
+
+
+  FUNCTION FACTORIAL(n)
+    INTEGER*8 :: n,ii,factorial
+    factorial=1
+    DO ii=1,n
+       factorial=factorial*ii
+    END DO
+    RETURN
+  END FUNCTION FACTORIAL
+
+
+  SUBROUTINE WRITE_EIGVALS(filename, array)
+    REAL*8, DIMENSION(:) :: array
+    CHARACTER(LEN=*) :: filename
+    INTEGER*4 :: ii
+    
+    OPEN(UNIT=43, FILE=filename, STATUS="replace", ACTION="write")
+    
+    DO ii=1,SIZE(array,1)
+       WRITE(43,*) array(ii)
+    END DO
+    CLOSE(43)
+    RETURN
+  END SUBROUTINE WRITE_EIGVALS
+
+
+  SUBROUTINE WRITE_EIGVECS(filename, xvals, array)
+    REAL*8, DIMENSION(:) :: xvals
+    REAL*8, DIMENSION(:,:) :: array
+    CHARACTER(LEN=*) :: filename
+    INTEGER*4 :: ii, jj
+    
+    OPEN(UNIT=43, FILE=filename, STATUS="replace", ACTION="write")
+    
+    DO ii=1,SIZE(array,1)
+       WRITE(43,*) xvals(ii), (array(ii,jj), jj=1,SIZE(array,2))
+    END DO
+    CLOSE(43)
+    RETURN
+  END SUBROUTINE WRITE_EIGVECS
+  
+    
+END MODULE SOLVE_SCHR

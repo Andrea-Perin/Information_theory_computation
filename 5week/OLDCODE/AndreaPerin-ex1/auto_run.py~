@@ -1,0 +1,12 @@
+import subprocess as sub
+import os
+
+cwd = os.getcwd()
+exec_name = 'spacing_generator.x'
+result_file = 'spacings.dat'
+
+separate_folder = True
+
+if (separate_folder):
+
+

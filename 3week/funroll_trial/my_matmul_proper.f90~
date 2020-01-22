@@ -1,0 +1,70 @@
+MODULE MYMATMUL
+  ! The MYMATMUL module contains different implementations of the
+  ! matrix-matrix multiplication algorithm. These are based on the
+  ! different use of indexes, as to employ different orderings. 
+  IMPLICIT NONE
+
+  INTEGER*4 :: ii,jj,kk
+  REAL*8, DIMENSION(:,:), ALLOCATABLE :: mat1, mat2, result
+
+  FUNCTION CHECK_DIMS(size1,size2)
+    ! This function checks whether the two vector in input,
+    ! representing the dimensions of two matrices, allow for the
+    ! computation of a matrix-matrix product.
+    ! check_dims : a logical value, is True when the dimensions
+    !              are compatible, False otherwise
+    LOGICAL :: check_dims
+    INTEGER*4, DIMENSION(2) :: size1, size2
+    IF (size1(2) .eq. size2(1)) check_dims = .TRUE.
+    RETURN
+  END FUNCTION CHECK_DIMS
+  
+
+  FUNCTION MATMUL_IJK(matrix1,matrix2)
+
+    INTEGER*4 :: ii,jj,kk
+    REAL*8, DIMENSION(:,:) :: matrix1,matrix2
+    REAL*8, DIMENSION(SHAPE(matrix1)(1),SHAPE(matrix2)(2)) :: matmul_ijk
+    INTEGER*4, DIMENSION(2) :: size1,size2 
+    matmul_ijk = 0.d0
+    size1 = SHAPE(matrix1)
+    size2 = SHAPE(matrix2)
+    IF (CHECK_DIMS(size1,size2)) THEN
+       DO ii=1,size1(1)
+          DO jj=1,size2(2)
+             DO kk=1,size1(2)
+                matmul_ijk(ii,jj) = matmul_ijk(ii,jj)+&
+                     matrix1(ii,kk)*matrix2(kk,jj)
+             ENDDO
+          ENDDO
+       ENDDO
+       RETURN
+    ELSE
+       PRINT*, "Wrong dimensions."
+       RETURN
+    ENDIF
+  END FUNCTION MATMUL_IJK
+  
+END MODULE MYMATMUL
+
+
+PROGRAM PROPERTRIAL
+  USE MYMATMUL
+  IMPLICIT NONE
+
+  INTEGER*4 :: rows1,cols1,rows2,cols2
+
+  rows1=2
+  cols1=3
+  rows2=3
+  cols2=4
+  
+  ALLOCATE(mat1(rows1,cols1),mat2(rows2,cols2))
+  CALL RANDOM_NUMBER(mat1)
+  CALL RANDOM_NUMBER(mat2)
+  resu = MATMUL_IJK(mat1,mat2)
+  DO ii=1,rows1
+     PRINT*, resu(ii,:)
+  ENDDO
+  STOP
+END PROGRAM PROPERTRIAL

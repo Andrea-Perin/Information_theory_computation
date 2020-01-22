@@ -1,0 +1,114 @@
+
+
+*******************************************************************************
+Fri Nov  8 16:32:05 2019
+
+
+FIT:    data read from input_file using 1:2
+        format = x:z
+        #datapoints = 50
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x)=(a*x**alpha)*(exp(-b*x**beta))
+fitted parameters initialized with current variable values
+
+  24 7.0413819579e-03  -6.11e-03  3.06e-01    2.772503e+00   1.646464e+00   1.351496e+00   1.824010e+00
+
+After 24 iterations the fit converged.
+final sum of squares of residuals : 0.00704138
+rel. change during last iteration : -6.10937e-08
+
+degrees of freedom    (FIT_NDF)                        : 46
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.0123723
+variance of residuals (reduced chisquare) = WSSR/ndf   : 0.000153074
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 2.7725           +/- 0.2668       (9.621%)
+alpha           = 1.64646          +/- 0.06915      (4.2%)
+b               = 1.3515           +/- 0.09798      (7.249%)
+beta            = 1.82401          +/- 0.07124      (3.906%)
+
+correlation matrix of the fit parameters:
+                a      alpha  b      beta   
+a               1.000 
+alpha           0.979  1.000 
+b               0.998  0.972  1.000 
+beta           -0.974 -0.922 -0.981  1.000 
+
+
+*******************************************************************************
+Fri Nov  8 16:35:01 2019
+
+
+FIT:    data read from input_file using 1:2
+        format = x:z
+        #datapoints = 50
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x)=(a*x**alpha)*(exp(-b*x**beta))
+fitted parameters initialized with current variable values
+
+  24 7.0413819579e-03  -6.11e-03  3.06e-01    2.772503e+00   1.646464e+00   1.351496e+00   1.824010e+00
+
+After 24 iterations the fit converged.
+final sum of squares of residuals : 0.00704138
+rel. change during last iteration : -6.10937e-08
+
+degrees of freedom    (FIT_NDF)                        : 46
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.0123723
+variance of residuals (reduced chisquare) = WSSR/ndf   : 0.000153074
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 2.7725           +/- 0.2668       (9.621%)
+alpha           = 1.64646          +/- 0.06915      (4.2%)
+b               = 1.3515           +/- 0.09798      (7.249%)
+beta            = 1.82401          +/- 0.07124      (3.906%)
+
+correlation matrix of the fit parameters:
+                a      alpha  b      beta   
+a               1.000 
+alpha           0.979  1.000 
+b               0.998  0.972  1.000 
+beta           -0.974 -0.922 -0.981  1.000 
+
+
+*******************************************************************************
+Fri Nov  8 16:35:53 2019
+
+
+FIT:    data read from input_file using 1:2
+        format = x:z
+        #datapoints = 50
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x)=(a*x**alpha)*(exp(-b*x**beta))
+fitted parameters initialized with current variable values
+
+  24 7.0413819579e-03  -6.11e-03  3.06e-01    2.772503e+00   1.646464e+00   1.351496e+00   1.824010e+00
+
+After 24 iterations the fit converged.
+final sum of squares of residuals : 0.00704138
+rel. change during last iteration : -6.10937e-08
+
+degrees of freedom    (FIT_NDF)                        : 46
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.0123723
+variance of residuals (reduced chisquare) = WSSR/ndf   : 0.000153074
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 2.7725           +/- 0.2668       (9.621%)
+alpha           = 1.64646          +/- 0.06915      (4.2%)
+b               = 1.3515           +/- 0.09798      (7.249%)
+beta            = 1.82401          +/- 0.07124      (3.906%)
+
+correlation matrix of the fit parameters:
+                a      alpha  b      beta   
+a               1.000 
+alpha           0.979  1.000 
+b               0.998  0.972  1.000 
+beta           -0.974 -0.922 -0.981  1.000 

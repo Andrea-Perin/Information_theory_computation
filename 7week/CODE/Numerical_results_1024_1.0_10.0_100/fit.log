@@ -1,0 +1,93 @@
+
+
+*******************************************************************************
+Fri Nov 29 21:27:15 2019
+
+
+FIT:    data read from 'movement.dat'
+        format = z
+        #datapoints = 80
+        residuals are weighted equally (unit weight)
+
+function used for fitting: g(x)
+	g(x)=500+51*(x*a+sin(a*x-3.1415))
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 3.4830843874e+08   0.00e+00  1.69e+03    1.000000e+00   1.000000e+00   1.000000e+00
+BREAK: Singular matrix in Invert_RtR
+
+*******************************************************************************
+Fri Nov 29 21:28:00 2019
+
+
+FIT:    data read from 'movement.dat'
+        format = z
+        #datapoints = 80
+        residuals are weighted equally (unit weight)
+
+function used for fitting: g(x)
+	g(x)=b+c*(x*a+sin(a*x-3.1415))
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 4.1416084502e+07   0.00e+00  4.03e+00    1.076777e-01   1.000000e+00   1.001000e+00
+   9 1.0183517551e+05  -8.85e-02  4.03e-06    7.515919e-01   5.015228e+02   7.143884e+00
+
+After 9 iterations the fit converged.
+final sum of squares of residuals : 101835
+rel. change during last iteration : -8.85179e-07
+
+degrees of freedom    (FIT_NDF)                        : 77
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 36.3667
+variance of residuals (reduced chisquare) = WSSR/ndf   : 1322.53
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 0.751592         +/- 0.01752      (2.331%)
+b               = 501.523          +/- 8.045        (1.604%)
+c               = 7.14388          +/- 0.2882       (4.034%)
+
+correlation matrix of the fit parameters:
+                a      b      c      
+a               1.000 
+b               0.002  1.000 
+c              -0.583 -0.702  1.000 
+
+
+*******************************************************************************
+Fri Nov 29 21:30:07 2019
+
+
+FIT:    data read from 'movement.dat'
+        format = z
+        #datapoints = 80
+        residuals are weighted equally (unit weight)
+
+function used for fitting: g(x)
+	g(x)=b+c*(x*a+sin(a*x-3.1415))
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             c            
+   0 4.3529639522e+04   0.00e+00  3.38e+02    1.000000e-01   5.000000e+02   5.000000e+01
+   3 3.5793432326e+02  -6.14e-01  3.38e-01    1.034599e-01   5.162565e+02   5.025825e+01
+
+After 3 iterations the fit converged.
+final sum of squares of residuals : 357.934
+rel. change during last iteration : -6.13792e-06
+
+degrees of freedom    (FIT_NDF)                        : 77
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 2.15604
+variance of residuals (reduced chisquare) = WSSR/ndf   : 4.6485
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 0.10346          +/- 0.0001903    (0.184%)
+b               = 516.256          +/- 0.4738       (0.09177%)
+c               = 50.2582          +/- 0.0997       (0.1984%)
+
+correlation matrix of the fit parameters:
+                a      b      c      
+a               1.000 
+b              -0.371  1.000 
+c              -0.337 -0.606  1.000 

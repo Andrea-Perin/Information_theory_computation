@@ -1,0 +1,165 @@
+MODULE UTILS
+
+  IMPLICIT NONE
+  REAL*8, PARAMETER :: pi=ACOS(-1d0)
+
+CONTAINS
+
+
+  FUNCTION ZTRACE(mat)
+    COMPLEX*16, DIMENSION(:,:) :: mat
+    COMPLEX*16 :: ztrace
+    INTEGER*4 :: ii
+
+    ztrace=0d0
+    DO ii=1,SIZE(mat,1)
+       ztrace=ztrace+mat(ii,ii)
+    END DO
+    RETURN
+  END FUNCTION ZTRACE
+  
+  
+  FUNCTION ZOUTER_PROD(vec1,vec2)RESULT(out)
+    COMPLEX*16, DIMENSION(:) :: vec1,vec2
+    COMPLEX*16, DIMENSION(SIZE(vec1),SIZE(vec2)) :: out
+    INTEGER*4 :: ii,jj
+    out=SPREAD(vec1,dim=2,ncopies=SIZE(vec2))*&
+         SPREAD(CONJG(vec2),dim=1,ncopies=SIZE(vec1))
+!!$    DO ii=1,SIZE(vec1,1)
+!!$       DO jj=1,SIZE(vec2,1)
+!!$          out(ii,jj)=vec1(ii)*CONJG(vec2(jj))
+!!$       END DO
+!!$    END DO
+    RETURN
+  END FUNCTION ZOUTER_PROD
+
+
+!!$  SUBROUTINE RANDINIT(seed,state)
+!!$    INTEGER*2, DIMENSION(4) :: seed
+!!$    COMPLEX*16, DIMENSION(:) :: state
+!!$    INTEGER*4 :: dim
+!!$    dim=SIZE(state)
+!!$    CALL ZLARNV(1,seed,dim,state)
+!!$    RETURN
+!!$  END SUBROUTINE RANDINIT
+
+  
+  SUBROUTINE RNDINIT(state)
+    INTEGER*4 :: ii,jj
+    COMPLEX*16, DIMENSION(:) :: state
+    REAL*8 :: repart,impart
+
+    DO ii=1,SIZE(state)
+       CALL RANDOM_NUMBER(repart)
+       CALL RANDOM_NUMBER(impart)
+       state(ii)=CMPLX(repart,impart)
+    END DO
+    RETURN
+  END SUBROUTINE RNDINIT
+
+  
+  FUNCTION ZNORMALIZE(vec)
+!!$    This func. returns a normalized version of the input vector.
+    COMPLEX*16, DIMENSION(:) :: vec
+    COMPLEX*16, DIMENSION(SIZE(vec)) :: znormalize
+
+    znormalize=vec/SQRT(SUM(ABS(vec)**2))
+    RETURN
+  END FUNCTION ZNORMALIZE
+  
+
+  FUNCTION ZKRONECKER(mat1,mat2)
+    COMPLEX*16, DIMENSION(:,:) :: mat1,mat2
+    COMPLEX*16, DIMENSION(SIZE(mat1,1)*SIZE(mat2,1),&
+         SIZE(mat1,2)*SIZE(mat2,2)) :: zkronecker
+    INTEGER*4 :: ii,jj,rr,cc
+    
+    rr=SIZE(mat2,1)
+    cc=SIZE(mat2,2)
+    DO ii=1,SIZE(mat1,1)
+       DO jj=1,SIZE(mat1,2)
+          zkronecker((ii-1)*rr+1:ii*rr,(jj-1)*cc+1:jj*cc)=&
+               mat1(ii,jj)*mat2
+       END DO
+    END DO
+    RETURN
+  END FUNCTION ZKRONECKER
+
+
+
+!!$  FUNCTION GET_REDUCED_DMAT(idx,matr,NN,dd)RESULT(red_dmat)
+!!$
+!!$    INTEGER*4 :: idx, NN, dd 
+!!$    COMPLEX*16, DIMENSION(:,:) :: matr
+!!$    COMPLEX*16, DIMENSION(:,:) :: red_dmat
+!!$
+!!$  END FUNCTION GET_REDUCED_DMAT
+  
+
+  FUNCTION SEP_TO_STATE(mat)RESULT(state)
+
+    COMPLEX*16, DIMENSION(:,:) :: mat
+    COMPLEX*16, DIMENSION(SIZE(mat,1)**SIZE(mat,2)) :: state
+    INTEGER*4 :: dd, NN, ii, jj
+    INTEGER*4, DIMENSION(SIZE(mat,2)) :: div
+
+    dd=SIZE(mat,1)
+    NN=SIZE(mat,2)
+    state=CMPLX(1d0)
+    DO ii=1,NN
+       div(ii)=dd**(NN-ii)
+    END DO
+    DO ii=1,dd*NN
+       DO jj=1,NN
+          state(ii)=state(ii)*mat( MOD(ii/div(jj),dd),jj )
+          !  state(ii)= PRODUCT( MOD(mat(ii/div(jj),dd),jj), jj=1,NN )
+       END DO
+    END DO
+    RETURN
+  END FUNCTION SEP_TO_STATE
+  
+
+        
+  FUNCTION TRACE_OUT(idx,mat,dd,NN)RESULT(red_dmat)
+    INTEGER*4 :: idx, dd, NN, ii, jj, kk, jump
+    COMPLEX*16, DIMENSION(:,:) :: mat
+    INTEGER*4, DIMENSION(SIZE(mat,1)/dd) :: start_idx,range
+    COMPLEX*16, DIMENSION(SIZE(mat,1)/dd,SIZE(mat,2)/dd) :: red_dmat
+
+    range=(/(ii, ii=0,SIZE(mat,1)/dd-1)/)
+    start_idx=range
+    DO ii=2,idx
+       start_idx=start_idx+(MOD(range/(dd**(NN-ii)),dd))*(dd**(NN-ii))
+    END DO
+    start_idx=start_idx+1
+    print*, start_idx
+    jump=dd**(NN-idx)
+    red_dmat=0.d0
+    DO ii=1,SIZE(mat,1)/dd
+       DO jj=1,SIZE(mat,2)/dd
+          DO kk=0,dd-1
+             red_dmat(ii,jj)=red_dmat(ii,jj)+&
+                  mat(start_idx(ii)+kk*jump,start_idx(jj)+kk*jump)
+          END DO
+!!$          SUM(mat(start_idx(ii)+kk*jump,&
+!!$               start_idx(jj)+kk*jump), kk=0,dd-1,step=1)
+       END DO
+    END DO
+    RETURN
+  END FUNCTION TRACE_OUT
+
+
+  
+  SUBROUTINE WRITE_MAT(fname, mat)
+    CHARACTER*9 :: fname
+    COMPLEX*16, DIMENSION(:,:) :: mat
+    INTEGER*4 :: ii
+    OPEN(12, file=fname, status="REPLACE", action="WRITE")
+    DO ii=1,SIZE(mat,1)
+       WRITE(12,*), mat(ii,:)
+    END DO    
+    RETURN       
+  END SUBROUTINE WRITE_MAT
+    
+
+END MODULE UTILS

@@ -1,0 +1,30 @@
+
+
+*******************************************************************************
+Fri Nov  8 20:04:18 2019
+
+
+FIT:    data read from input_file using 1:2
+        format = x:z
+        #datapoints = 200
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x)=(a*x**alpha)*(exp(-b*x**beta))
+fitted parameters initialized with current variable values
+
+
+Current data point
+=========================
+#               = 1 out of 200
+x               = 1.63653        
+z               = 1.71429        
+
+Current set of parameters
+=========================
+a               = 1.63653        
+alpha           = -1.01043       
+b               = 1.24056        
+beta            = 0.663824       
+
+BREAK: Undefined value during function evaluation

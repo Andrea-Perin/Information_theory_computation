@@ -1,0 +1,90 @@
+PROGRAM MAIN
+  
+  USE DEBUGGER
+  IMPLICIT NONE
+
+  ! VARIABLE DECLARATION
+!!$  --------------------------------------------------------
+  ! input management parameters
+  INTEGER*4, PARAMETER :: num_int_params=2
+  INTEGER*4, DIMENSION(num_int_params) :: intparams
+
+  !physical quantities
+  COMPLEX*16, DIMENSION(:,:), ALLOCATABLE :: pure_sep
+  COMPLEX*16, DIMENSION(:), ALLOCATABLE :: pure_notsep
+  INTEGER*4 :: dd, NN
+
+  !utility variables
+  CHARACTER*10 :: tmp_arg
+  INTEGER*4 :: ii, jj, kk
+  INTEGER*2, DIMENSION(4) :: seed
+!!$  --------------------------------------------------------
+
+  
+! DEBUG FLAG
+!!$  --------------------------------------------------------
+  LOGICAL :: deb = .TRUE.
+!!$  --------------------------------------------------------
+
+  
+  ! INPUT PARAMETERS MANAGEMENT
+!!$  --------------------------------------------------------
+  ! creating a dictionary for int variables
+  EQUIVALENCE (intparams(1), NN)
+  EQUIVALENCE (intparams(2), dd)
+  
+  NN=2 !number of subsystems (Hilbert spaces)
+  dd=2 !number of dimension for each Hilbert space
+
+  ! getting command line parameters
+  DO ii=1, COMMAND_ARGUMENT_COUNT()
+     CALL GET_COMMAND_ARGUMENT(ii, tmp_arg)
+     IF(LEN_TRIM(tmp_arg).NE.0)THEN
+        READ(tmp_arg,*) intparams(ii)
+     END IF
+  END DO
+!!$  --------------------------------------------------------
+
+
+  !ALLOCATING FOR SEPARABLE AND NON SEPARABLE STATES
+!!$  --------------------------------------------------------
+  !A pure separable state with N components can be written
+  !as the tensor product of N pure states. As a consequence,
+  !in order to store it, only a (ddxNN) matrix is needed.
+  ALLOCATE(pure_sep(dd,NN))
+
+  !Things are more complicated when one considers a general
+  !pure wave function; in this case, mixing can indeed
+  !happen, and so a rank-NN tensor must be used, with each
+  !of the sides having in general dd elements.
+  !However, instead of using a matrix representation,
+  !an appropriately lon vector will be employed.
+  ALLOCATE(pure_notsep(dd**NN))
+!!$  --------------------------------------------------------
+
+  
+  !INITIALIZING BOTH STATES RANDOMLY
+!!$  --------------------------------------------------------
+  !initializing the seed
+  seed=(/1,2,3,5/) !NB: the last must be odd! 
+
+  !using LAPACK subroutine ZLARNV for each column of pure_sep 
+  DO ii=1,NN
+     CALL ZLARNV( 1, seed, dd, pure_sep(:,ii) )
+  END DO
+  
+  !using LAPACK subroutine ZLARNV for all pure_notsep
+  CALL ZLARNV( 1, seed, dd**NN, pure_notsep )
+
+  !normalizing both vectors
+  pure_sep = pure_sep/SQRT(SUM(ABS(pure_sep)**2))
+  pure_notsep = pure_notsep/SQRT(SUM(ABS(pure_notsep)**2))
+
+  !checking the normalization
+  CALL DEBUG(deb,pure_sep,ABS( SUM(ABS(pure_sep)**2)-1 ).GE.1d-14,&
+       "Pure separable state is not normalized.")
+  CALL DEBUG(deb,pure_notsep,ABS( SUM(ABS(pure_notsep)**2)-1 ).GE.1d-14,&
+       "Pure not separable state is not normalized.")
+!!$  --------------------------------------------------------
+
+END PROGRAM MAIN

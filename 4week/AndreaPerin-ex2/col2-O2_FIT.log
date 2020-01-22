@@ -1,0 +1,36 @@
+
+
+*******************************************************************************
+Mon Nov  4 20:38:02 2019
+
+
+FIT:    data read from input_file using 1:2
+        format = x:z
+        #datapoints = 30
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x)=a+b*x**c
+fitted parameters initialized with current variable values
+
+ 411 1.5430490214e+00  -2.06e-03  2.21e-06   -1.501277e-02   4.700113e-09   3.049851e+00
+
+After 411 iterations the fit converged.
+final sum of squares of residuals : 1.54305
+rel. change during last iteration : -2.0607e-08
+
+degrees of freedom    (FIT_NDF)                        : 27
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.239061
+variance of residuals (reduced chisquare) = WSSR/ndf   : 0.05715
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = -0.0150128       +/- 0.04854      (323.3%)
+b               = 4.70011e-09      +/- 9.403e-10    (20.01%)
+c               = 3.04985          +/- 0.02621      (0.8594%)
+
+correlation matrix of the fit parameters:
+                a      b      c      
+a               1.000 
+b              -0.331  1.000 
+c               0.325 -1.000  1.000 

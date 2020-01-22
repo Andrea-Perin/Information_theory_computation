@@ -1,0 +1,40 @@
+
+
+*******************************************************************************
+Fri Nov  8 11:24:23 2019
+
+
+FIT:    data read from 'another_dist.dat'
+        format = z
+        #datapoints = 45
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x)=a*x**alp*(exp(-b*x**bet))
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b             alp           bet          
+   0 2.5215734864e-01   0.00e+00  3.79e-01    2.000000e+00   1.000000e+00   1.000000e+00   2.000000e+00
+   5 3.7594031195e-03  -9.58e-04  3.79e-01    2.431247e+00   1.120587e+00   1.541794e+00   2.097661e+00
+
+After 5 iterations the fit converged.
+final sum of squares of residuals : 0.0037594
+rel. change during last iteration : -9.57523e-09
+
+degrees of freedom    (FIT_NDF)                        : 41
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.00957563
+variance of residuals (reduced chisquare) = WSSR/ndf   : 9.16928e-05
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 2.43125          +/- 0.1259       (5.18%)
+b               = 1.12059          +/- 0.05296      (4.726%)
+alp             = 1.54179          +/- 0.04134      (2.681%)
+bet             = 2.09766          +/- 0.0534       (2.546%)
+
+correlation matrix of the fit parameters:
+                a      b      alp    bet    
+a               1.000 
+b               0.997  1.000 
+alp             0.973  0.963  1.000 
+bet            -0.967 -0.978 -0.906  1.000 

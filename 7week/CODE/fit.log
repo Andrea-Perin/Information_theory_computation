@@ -1,0 +1,72 @@
+
+
+*******************************************************************************
+Sat Nov 30 15:16:03 2019
+
+
+FIT:    data read from filename
+        format = z
+        #datapoints = 100
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x)=(potspeed)*x+(1./omega)*sin(omega*(potspeed)*x-3.1415)
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   omega         potspeed     
+   0 9.6171838359e-03   0.00e+00  1.48e-01    1.000000e+00   1.000000e-02
+ 703 5.2837992725e-03  -7.03e-06  1.48e-03    1.443149e+01   1.883541e-03
+
+After 703 iterations the fit converged.
+final sum of squares of residuals : 0.0052838
+rel. change during last iteration : -7.02581e-11
+
+degrees of freedom    (FIT_NDF)                        : 98
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.00734277
+variance of residuals (reduced chisquare) = WSSR/ndf   : 5.39163e-05
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+omega           = 14.4315          +/- 2.846        (19.72%)
+potspeed        = 0.00188354       +/- 0.00022      (11.68%)
+
+correlation matrix of the fit parameters:
+                omega  potspe 
+omega           1.000 
+potspeed       -0.999  1.000 
+
+
+*******************************************************************************
+Sat Nov 30 15:17:35 2019
+
+
+FIT:    data read from filename
+        format = z
+        #datapoints = 100
+        residuals are weighted equally (unit weight)
+
+function used for fitting: f(x)
+	f(x)=(potspeed)*x+(1./omega)*sin(omega*(potspeed)*x-3.1415)
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   omega         potspeed     
+   0 9.8543338934e-02   0.00e+00  2.88e+00    5.000000e+00   5.000000e-02
+   3 2.5834282394e-02   0.00e+00  2.88e+05    4.999254e+00   5.038587e-02
+
+After 3 iterations the fit converged.
+final sum of squares of residuals : 0.0258343
+rel. change during last iteration : 0
+
+degrees of freedom    (FIT_NDF)                        : 98
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.0162362
+variance of residuals (reduced chisquare) = WSSR/ndf   : 0.000263615
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+omega           = 4.99925          +/- 0.004819     (0.09639%)
+potspeed        = 0.0503859        +/- 2.817e-05    (0.05591%)
+
+correlation matrix of the fit parameters:
+                omega  potspe 
+omega           1.000 
+potspeed       -0.567  1.000 
